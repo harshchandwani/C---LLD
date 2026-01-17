@@ -1,53 +1,97 @@
 #include <iostream>
 using namespace std;
 
-// Behavior interface
-class MoveStrategy {
+// ----------------------
+// Interfaces
+// ----------------------
+class Talk {
 public:
-    virtual void move() = 0;
-    virtual ~MoveStrategy() {}
+    virtual void talk() = 0;
+    virtual ~Talk() {};
 };
 
-// Concrete behaviors
-class WheelMove : public MoveStrategy {
+class Walk {
 public:
-    void move() override {
-        cout << "Moving with wheels\n";
+    virtual void walk() = 0;
+    virtual ~Walk() {};
+};
+
+// ----------------------
+// Concrete Strategies
+// ----------------------
+class Talkable : public Talk {
+public:
+    void talk() override { // 'override' is good practice in C++11+
+        cout << "This robot can talk" << endl;
     }
 };
 
-class SlideMove : public MoveStrategy {
+class NoTalk : public Talk {
 public:
-    void move() override {
-        cout << "Sliding forward\n";
+    void talk() override {
+        cout << "This robot can not talk" << endl;
     }
 };
 
-// Context that uses a strategy
-class ToyCar {
+class Walkable : public Walk {
+public:
+    void walk() override {
+        cout << "This robot can walk" << endl;
+    }
+};
+
+class NoWalk : public Walk {
+public:
+    void walk() override {
+        cout << "This robot can not walk" << endl;
+    }
+};
+
+// ----------------------
+// Context (The Robot)
+// ----------------------
+class Robot {
 private:
-    MoveStrategy* strategy;
-public:
-    ToyCar(MoveStrategy* s) : strategy(s) {}
+    // FIX 1: Renamed variables to avoid collision with function names
+    Walk* walkBehavior; 
+    Talk* talkBehavior;
 
-    void setStrategy(MoveStrategy* s) {
-        strategy = s;
+public:
+    Robot(Walk* w, Talk* t) {
+        this->walkBehavior = w;
+        this->talkBehavior = t;
     }
 
-    void performMove() {
-        strategy->move();
+    // Optional: Destructor to clean up memory if Robot owns the strategies
+    ~Robot() {
+        delete walkBehavior;
+        delete talkBehavior;
+    }
+
+    void walk() {
+        // Delegating to the specific strategy
+        walkBehavior->walk(); 
+    }
+
+    void talk() {
+        talkBehavior->talk();
     }
 };
 
 int main() {
-    WheelMove wheels;
-    SlideMove slide;
+    // We create strategies
+    Talkable* talking = new Talkable();
+    NoWalk* nowalking = new NoWalk();
 
-    ToyCar car(&wheels);
-    car.performMove();
+    // We pass them to the robot
+    Robot* robot = new Robot(nowalking, talking);
 
-    car.setStrategy(&slide);
-    car.performMove();
+    robot->talk();
+    robot->walk();
+
+    // FIX 2: Clean up the robot 
+    // (The Robot's destructor will clean up 'talking' and 'nowalking' for us)
+    delete robot; 
 
     return 0;
 }

@@ -1,5 +1,6 @@
 {
     "files.autoSave": "afterDelay",
     "editor.defaultFormatter": "ms-vscode.cpptools",
-    "editor.mouseMiddleClickAction": "openLink"
+    "editor.mouseMiddleClickAction": "openLink",
+    "C_Cpp.errorSquiggles": "disabled"
 }
